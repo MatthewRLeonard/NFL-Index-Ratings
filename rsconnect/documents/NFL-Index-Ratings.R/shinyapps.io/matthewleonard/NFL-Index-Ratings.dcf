@@ -1,0 +1,14 @@
+name: NFL-Index-Ratings
+title: NFL-Index-Ratings
+username:
+account: matthewleonard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4261787
+bundleId: 4710566
+url: https://matthewleonard.shinyapps.io/NFL-Index-Ratings/
+when: 1623571605.54488
+lastSyncTime: 1623571605.54488
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: standings.csv|images
