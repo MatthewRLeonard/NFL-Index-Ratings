@@ -1,0 +1,4 @@
+# NFL-Index-Ratings
+An NFL team index ratings system. nflfastR play-by-play data is analysed to create team offensive and defensive statistics, such as Success Rate, Available Yards % and Expected Points Added per play. Taking the offensive and defensive statistics, net statistics are built and then scaled. Combining these scaled scores, a rating for every team is produced with a range from 0 - 100, hence the term "index rating".
+
+Using R packages such as shiny, shinyWidgets, reactable and reactablefmtr, a web application is used as a dynamic tool to display the index ratings and many other statistics, including the different net ratings that were scaled to create the overall ratings. The web application can be filtered for many past NFL seasons, as well as conference, division, overall, offensive and defensive ratings. All columns are sortable and it looks cool!
