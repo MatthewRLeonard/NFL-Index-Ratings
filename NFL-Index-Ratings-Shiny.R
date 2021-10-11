@@ -10,7 +10,7 @@ library(gfonts)
 
 # 2. Load Data ----
 
-team_stats <- read.csv(url("https://drive.google.com/uc?export=download&id=1pC2_5Nk76tPv4QVvj9Kr6SaL-bpa8Wml"), header = TRUE)
+team_stats <- read.csv(url("https://drive.google.com/uc?export=download&id=1o-Xifk4tM8FtbIMr1LPkxAHFugl2V3Uh"), header = TRUE)
 
 # 3. Functions ----
 
@@ -21,7 +21,7 @@ sidebarPanelFunction <- function(sidebarPanelx) {
       inputId = "season",
       label = "Season",
       choices = sort(unique(team_stats$season), method = "radix"),
-      selected = 2020,
+      selected = 2021,
       multiple = FALSE,
       options = list(`multiple-separator` = ", ")
     ),
