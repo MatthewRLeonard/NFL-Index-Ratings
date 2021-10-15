@@ -135,7 +135,7 @@ off_passing <- games |>
   summarise(num_plays = sum(play_type == "pass", na.rm = TRUE),
             epa_pp = sum(epa, na.rm = TRUE) / num_plays,
             success_rate = sum(success, na.rm = TRUE) / num_plays,
-            explosiveness = (sum(epa[success == 1], na.rm = TRUE) / sum(success == 1, na.rm = TRUE)) - 1,
+            explosiveness = sum(yards_gained[yards_gained >= 20], na.rm = TRUE) / sum(yards_gained, na.rm = TRUE),
             negatives = sum(yards_gained < 0) / num_plays,
             big_plays = sum(yards_gained >= 20) / num_plays,
             air_yards_pp = sum(air_yards, na.rm = TRUE) / num_plays,
@@ -157,7 +157,7 @@ def_passing <- games |>
   summarise(num_plays = sum(play_type == "pass", na.rm = TRUE),
             epa_pp = sum(epa, na.rm = TRUE) / num_plays,
             success_rate = sum(success, na.rm = TRUE) / num_plays,
-            explosiveness = (sum(epa[success == 1], na.rm = TRUE) / sum(success == 1, na.rm = TRUE)) - 1,
+            explosiveness = sum(yards_gained[yards_gained >= 20], na.rm = TRUE) / sum(yards_gained, na.rm = TRUE),
             negatives = sum(yards_gained < 0) / num_plays,
             big_plays = sum(yards_gained >= 20) / num_plays,
             air_yards_pp = sum(air_yards, na.rm = TRUE) / num_plays,
@@ -179,9 +179,9 @@ off_rushing <- games |>
   summarise(num_plays = sum(play_type == "run", na.rm = TRUE),
             epa_pp = sum(epa, na.rm = TRUE) / num_plays,
             success_rate = sum(success, na.rm = TRUE) / num_plays,
-            explosiveness = (sum(epa[success == 1], na.rm = TRUE) / sum(success == 1, na.rm = TRUE)) - 1,
+            explosiveness = sum(yards_gained[yards_gained >= 10], na.rm = TRUE) / sum(yards_gained, na.rm = TRUE),
             negatives = sum(yards_gained < 0) / num_plays,
-            big_plays = sum(yards_gained >= 20) / num_plays,
+            big_plays = sum(yards_gained >= 10) / num_plays,
             ypc = sum(yards_gained, na.rm = TRUE) / num_plays
   ) |>
   rename_with(function(x) paste0("off_rush_", x)) |>
@@ -195,9 +195,9 @@ def_rushing <- games |>
   summarise(num_plays = sum(play_type == "run", na.rm = TRUE),
             epa_pp = sum(epa, na.rm = TRUE) / num_plays,
             success_rate = sum(success, na.rm = TRUE) / num_plays,
-            explosiveness = (sum(epa[success == 1], na.rm = TRUE) / sum(success == 1, na.rm = TRUE)) - 1,
+            explosiveness = sum(yards_gained[yards_gained >= 10], na.rm = TRUE) / sum(yards_gained, na.rm = TRUE),
             negatives = sum(yards_gained < 0) / num_plays,
-            big_plays = sum(yards_gained >= 20) / num_plays,
+            big_plays = sum(yards_gained >= 10) / num_plays,
             ypc = sum(yards_gained, na.rm = TRUE) / num_plays
   ) |>
   rename_with(function(x) paste0("def_rush_", x)) |>
@@ -281,5 +281,5 @@ write.csv(team_stats, localfile, row.names = FALSE)
 
 # 7. Upload CSV to Google Drive ----
 
-googledrive::drive_upload(localfile, "Data/Projects/NFL-Index-Ratings/", overwrite = TRUE) |>
+googledrive::drive_put(localfile, "Data/Projects/NFL-Index-Ratings/") |>
   googledrive::drive_share_anyone()
