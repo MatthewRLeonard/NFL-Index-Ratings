@@ -10,7 +10,7 @@ library(gfonts)
 
 # 2. Load Data ----
 
-team_stats <- read.csv(url("https://drive.google.com/uc?export=download&id=1o-Xifk4tM8FtbIMr1LPkxAHFugl2V3Uh"), header = TRUE)
+team_stats <- read.csv(url("https://drive.google.com/uc?export=download&id=1aMXgswjKKrok2nvH_9WRRdtFBbjMeaTE"), header = TRUE)
 
 # 3. Functions ----
 
@@ -134,6 +134,16 @@ ui <- shiny::fluidPage(
                           p(),
                           reactableOutput("rushing_off"),
                           p()
+                 ),
+                 tabPanel("Passing Defense",
+                          p(),
+                          reactableOutput("passing_def"),
+                          p()
+                 ),
+                 tabPanel("Rushing Defense",
+                          p(),
+                          reactableOutput("rushing_def"),
+                          p()
                  )
                ),
                width = 10
@@ -176,7 +186,7 @@ server <- function(input, output, session) {
           "asc"
         } else if (colname == "TFLs" && type == "def") {
           "desc"
-        } else if (type == "def") {
+        } else if (type == "def" | type == "defoth") {
           "asc"
         } else {
           "desc"
@@ -184,18 +194,18 @@ server <- function(input, output, session) {
       cell = reactablefmtr::color_tiles(
         team_stats,
         colors = if (colname == "TFLs" && type == "off") {
-            scales::brewer_pal(palette = "RdBu", direction = -1)(11)
+          scales::brewer_pal(palette = "RdBu", direction = -1)(11)
         } else if (colname == "TFLs" && type == "def") {
           scales::brewer_pal(palette = "RdBu")(11)
-        } else if (type == "def") {
+        } else if (type == "def" | type == "defoth") {
           scales::brewer_pal(palette = "RdBu", direction = -1)(11)
         } else {
-            scales::brewer_pal(palette = "RdBu")(11)
+          scales::brewer_pal(palette = "RdBu")(11)
         },
         text_color = "#23262b",
         brighten_text_color = "hsl(0, 0%, 80%)",
         opacity = 0.9,
-        number_fmt = if (colname == "Yards / Play" | type == "offoth") {
+        number_fmt = if (colname == "EPA / Play" | colname == "Yards / Play" | type == "offoth" | type == "defoth") {
             scales::label_number(accuracy = 0.01)
           } else if (type == "rating") {
             scales::label_number(accuracy = 0.1, scale = 100)
@@ -501,6 +511,126 @@ server <- function(input, output, session) {
                 colGroup(name = "Index Ratings", columns = c("net_rating", "off_rating")),
                 colGroup(name = "Rushing Factors", columns = c("off_rush_epa_pp", "off_rush_success_rate", "off_rush_explosiveness", "off_rush_negatives")),
                 colGroup(name = "Other Stats", columns = c("off_rush_ypc"))
+              ),
+              language = reactableLang(
+                noData = "No teams found, please tweak filters.",
+              ),
+              theme = theme
+    )
+  })
+  
+  ## Passing Defense Table ---- 
+  
+  output$passing_def <- renderReactable({
+    
+    reactable(filtered()[c(1:8,10,62:65,73,69:70)], resizable = TRUE, pagination = FALSE, highlight = TRUE, fullWidth = FALSE, showSortable = TRUE,
+              defaultSortOrder = "desc",
+              defaultSorted = c("def_rating"),
+              columns = list(
+                season = colDef(
+                  show = FALSE
+                ),
+                team = colDef(
+                  show = FALSE
+                ),
+                team_name = colDef(
+                  name = "Team",
+                  defaultSortOrder = "asc",
+                  minWidth = 220,
+                  cell = function(value, index) {
+                    teamIndex <- filtered()[2:3]$team[index]
+                    logo <- filtered()[7]$team_logo_espn[index]
+                    tagList(
+                      div(img(class = "logo", alt = paste(teamIndex, "logo"), src = logo), value)
+                    )
+                  }
+                ),
+                conf = colDef(
+                  show = FALSE
+                ),
+                division = colDef(
+                  name = "Division",
+                  defaultSortOrder = "asc"
+                ),
+                div = colDef(
+                  show = FALSE
+                ),
+                team_logo_espn = colDef(
+                  show = FALSE
+                ),
+                net_rating = ReactablefmtrCell(value, "rating", "Overall"),
+                def_rating = ReactablefmtrCell(value, "rating", "Defense"),
+                def_pass_epa_pp = ReactablefmtrCell(value, "def", "EPA / Play"),
+                def_pass_success_rate = ReactablefmtrCell(value, "def", "Success Rate"),
+                def_pass_explosiveness = ReactablefmtrCell(value, "def", "Explosiveness"),
+                def_pass_negatives = ReactablefmtrCell(value, "def", "TFLs"),
+                def_pass_ypa = ReactablefmtrCell(value, "defoth", "Yards / Att"),
+                def_pass_air_yards_pc = ReactablefmtrCell(value, "defoth", "Air Yds / Comp"),
+                def_pass_yac_pc = ReactablefmtrCell(value, "defoth", "YAC / Comp")
+              ),
+              columnGroups = list(
+                colGroup(name = "Index Ratings", columns = c("net_rating", "def_rating")),
+                colGroup(name = "Passing Factors", columns = c("def_pass_epa_pp", "def_pass_success_rate", "def_pass_explosiveness", "def_pass_negatives")),
+                colGroup(name = "Other Stats", columns = c("def_pass_ypa", "def_pass_air_yards_pc", "def_pass_yac_pc"))
+              ),
+              language = reactableLang(
+                noData = "No teams found, please tweak filters.",
+              ),
+              theme = theme
+    )
+  })
+  
+  ## Rushing Defense Table ---- 
+  
+  output$rushing_def <- renderReactable({
+    
+    reactable(filtered()[c(1:8,10,75:78,80)], resizable = TRUE, pagination = FALSE, highlight = TRUE, fullWidth = FALSE, showSortable = TRUE,
+              defaultSortOrder = "desc",
+              defaultSorted = c("def_rating"),
+              columns = list(
+                season = colDef(
+                  show = FALSE
+                ),
+                team = colDef(
+                  show = FALSE
+                ),
+                team_name = colDef(
+                  name = "Team",
+                  defaultSortOrder = "asc",
+                  minWidth = 220,
+                  cell = function(value, index) {
+                    teamIndex <- filtered()[2:3]$team[index]
+                    logo <- filtered()[7]$team_logo_espn[index]
+                    tagList(
+                      div(img(class = "logo", alt = paste(teamIndex, "logo"), src = logo), value)
+                    )
+                  }
+                ),
+                conf = colDef(
+                  show = FALSE
+                ),
+                division = colDef(
+                  name = "Division",
+                  defaultSortOrder = "asc"
+                ),
+                div = colDef(
+                  show = FALSE
+                ),
+                team_logo_espn = colDef(
+                  show = FALSE
+                ),
+                net_rating = ReactablefmtrCell(value, "rating", "Overall"),
+                def_rating = ReactablefmtrCell(value, "rating", "Defense"),
+                def_rush_epa_pp = ReactablefmtrCell(value, "def", "EPA / Play"),
+                def_rush_success_rate = ReactablefmtrCell(value, "def", "Success Rate"),
+                def_rush_explosiveness = ReactablefmtrCell(value, "def", "Explosiveness"),
+                def_rush_negatives = ReactablefmtrCell(value, "def", "TFLs"),
+                def_rush_ypc = ReactablefmtrCell(value, "defoth", "Yards / Att")
+              ),
+              columnGroups = list(
+                colGroup(name = "Index Ratings", columns = c("net_rating", "def_rating")),
+                colGroup(name = "Rushing Factors", columns = c("def_rush_epa_pp", "def_rush_success_rate", "def_rush_explosiveness", "def_rush_negatives")),
+                colGroup(name = "Other Stats", columns = c("def_rush_ypc"))
               ),
               language = reactableLang(
                 noData = "No teams found, please tweak filters.",
